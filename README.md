@@ -12,7 +12,7 @@ Install conichi and save it in the dependencies list. For example:
 ## Example usage
 
 ```
-const conichi = require('conichi');
+const conichi = require('conichi-node-authorisation');
 
 // Replace these values with the cosumer_key, api_key, session_uuid given to you from conichi
 conichi.init(cosumer_key, api_key, session_uuid);
