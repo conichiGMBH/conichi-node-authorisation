@@ -1,0 +1,24 @@
+{
+  "name": "conichi-sdk",
+  "version": "1.0.0",
+  "description": "This module allows conichi services and 3rd party partners to make authenticated requests to the conichi API.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Marc Horne <marc.horne@conichi.com>",
+  "license": "ALv2",
+  "keywords": [
+    "conichi",
+    "hotel",
+    "management"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/conichiGMBH/conichi-node-authorisation.git"
+  },
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "request": "^2.82.0"
+  }
+}
