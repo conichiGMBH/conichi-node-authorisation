@@ -15,13 +15,16 @@ function init(customer_key, api_secret, session_uuid) {
   global.session_uuid = session_uuid;
 }
 
-function request(url, method, body, callback) {
+function api_request(url, method, body, callback) {
   try { 
     if (!url) throw 'You have not set the URL';
     if (!method) throw 'You have not set the method';
     if (!global.customer_key || !global.api_secret || !global.session_uuid) throw 'Have you forgot to call the init function first?';
   }
-  catch(err) { console.log(`Conichi SDK Error: ${ err }`); }
+  catch(err) {
+    console.log(`Conichi SDK Error: ${ err }`);
+    return;
+  }
   
   const reuqest_body = (body) ? JSON.stringify(body) : '';
 
@@ -67,7 +70,10 @@ function upload_image(url, formData, callback) {
     if (!formData) throw 'You have not set formData';
     if (!global.customer_key || !global.api_secret) throw 'Have you forgot to call the init function first?';
   }
-  catch(err) { console.log(`Conichi SDK Error: ${ err }`); }
+  catch(err) {
+    console.log(`Conichi SDK Error: ${ err }`);
+    return;
+  }
   
   const bodyhash_raw = crypto.createHmac('sha256', global.api_secret).update('').digest('base64')
   const bodyhash = bodyhash_raw.replace(/\//g, '_').replace(/\+/g, '-')
@@ -106,7 +112,7 @@ function upload_image(url, formData, callback) {
 };
 
 module.exports = {
-  init : init(),
-  request : request(),
-  upload_image : upload_image()
+  init : init,
+  request : api_request,
+  upload_image : upload_image
 }
