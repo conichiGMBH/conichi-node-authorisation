@@ -6,7 +6,8 @@ Conichi Node Authorisation allows conichi services and 3rd party partners to mak
 ## Installation
 
 Install conichi and save it in the dependencies list. For example:
-`npm install conichi --save`
+
+`npm install conichi-node-authorisation --save`
 
 
 ## Example usage
@@ -14,8 +15,12 @@ Install conichi and save it in the dependencies list. For example:
 ```
 const conichi = require('conichi-node-authorisation');
 
-// Replace these values with the cosumer_key, api_key, session_uuid given to you from conichi
-conichi.init(cosumer_key, api_key, session_uuid);
+// Replace these values with the cosumer_key and api_key given to you from conichi.
+conichi.init(cosumer_key, api_key);
+
+// Set user UUID, this should be done directly after the user is logged in using the UUID
+// you recieve from the login response.
+conichi.set_uuid(uuid);
 
 // Make request
 conichi.request(url, method, body, function(response){
