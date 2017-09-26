@@ -1,17 +1,21 @@
 const request = require('request');
 const crypto = require('crypto');
+const LocalStorage = require('node-localstorage').LocalStorage;
+const localStorage = new LocalStorage('./config');
 
 function init(customer_key, api_secret) {
   try { 
     if (!customer_key || !api_secret) throw 'Incomplete init values';
   }
   catch(err) {
-    console.log(`Conichi SDK Error: ${ err }`);
+    console.log(`Conichi API Error: ${ err }`);
     return;
   }
 
   global.customer_key = customer_key;
   global.api_secret = api_secret;
+  localStorage.setItem('customer_key', customer_key);
+  localStorage.setItem('api_secret', api_secret);
 }
 
 function set_uuid(session_uuid) {
@@ -19,26 +23,29 @@ function set_uuid(session_uuid) {
     if (!session_uuid) throw 'No UUID specified';
   }
   catch(err) {
-    console.log(`Conichi SDK Error: ${ err }`);
+    console.log(`Conichi API Error: ${ err }`);
     return;
   }
 
   global.session_uuid = session_uuid;
+  localStorage.setItem('session_uuid', session_uuid);
 }
 
 function api_request(url, method, body, callback) {
+  checkConfig();
+
   try { 
     if (!url) throw 'You have not set the URL';
     if (!method) throw 'You have not set the method';
     if (!global.customer_key || !global.api_secret) throw 'Have you forgot to call the init function first?';
   }
   catch(err) {
-    console.log(`Conichi SDK Error: ${ err }`);
+    console.log(`Conichi API Error: ${ err }`);
     return;
   }
-  
+
   const uuid = global.session_uuid || null;
-  
+
   const reuqest_body = (body) ? JSON.stringify(body) : '';
 
   const bodyhash_raw = crypto.createHmac('sha256', global.api_secret).update(reuqest_body).digest('base64');
@@ -69,7 +76,7 @@ function api_request(url, method, body, callback) {
       if (error) throw 'Error making api request';
     }
     catch(err) {
-      console.log(`Conichi SDK Error: ${ err }`, error);
+      console.log(`Conichi API Error: ${ err }`, error);
       return;
     }
 
@@ -78,6 +85,8 @@ function api_request(url, method, body, callback) {
 };
 
 function upload_image(url, formData, callback) {
+  checkConfig();
+
   try { 
     if (!url) throw 'You have not set the URL';
     if (!formData) throw 'You have not set formData';
@@ -85,10 +94,10 @@ function upload_image(url, formData, callback) {
     if (!global.session_uuid) throw 'Have you forgot to set the UUID first?';
   }
   catch(err) {
-    console.log(`Conichi SDK Error: ${ err }`);
+    console.log(`Conichi API Error: ${ err }`);
     return;
   }
-  
+
   const bodyhash_raw = crypto.createHmac('sha256', global.api_secret).update('').digest('base64')
   const bodyhash = bodyhash_raw.replace(/\//g, '_').replace(/\+/g, '-')
 
@@ -117,13 +126,19 @@ function upload_image(url, formData, callback) {
       if (error) throw 'Error making api request';
     }
     catch(err) {
-      console.log(`Conichi SDK Error: ${ err }`, error);
+      console.log(`Conichi API Error: ${ err }`, error);
       return;
     }
 
     callback(response);
   });
 };
+
+function checkConfig() {
+  if (!global.customer_key) { global.customer_key = localStorage.getItem('customer_key'); }
+  if (!global.api_secret) { global.api_secret = localStorage.getItem('api_secret'); }
+  if (!global.session_uuid) { global.session_uuid = localStorage.getItem('session_uuid'); }
+}
 
 module.exports = {
   init : init,

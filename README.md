@@ -35,6 +35,8 @@ conichi.upload_image(url, formData, function(response){
 
 Please refer to the documentation for information about the correct url endpoints, HTTP methods and expected body content.
 
+Please be sure to guard agaist 401 status response. If you receive a 401 error it means the session UUID has expired and the user must be prompted to  start a new session before any more requests can be sent to the API.
+
 
 ## API documentation
 
