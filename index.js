@@ -1,7 +1,5 @@
 const request = require('request');
 const crypto = require('crypto');
-const LocalStorage = require('node-localstorage').LocalStorage;
-const localStorage = new LocalStorage('./config');
 
 function init(customer_key, api_secret) {
   try { 
@@ -14,26 +12,9 @@ function init(customer_key, api_secret) {
 
   global.customer_key = customer_key;
   global.api_secret = api_secret;
-  localStorage.setItem('customer_key', customer_key);
-  localStorage.setItem('api_secret', api_secret);
 }
 
-function set_uuid(session_uuid) {
-  try { 
-    if (!session_uuid) throw 'No UUID specified';
-  }
-  catch(err) {
-    console.log(`Conichi API Error: ${ err }`);
-    return;
-  }
-
-  global.session_uuid = session_uuid;
-  localStorage.setItem('session_uuid', session_uuid);
-}
-
-function api_request(url, method, body, callback) {
-  checkConfig();
-
+function api_request(url, method, body, uuid, callback) {
   try { 
     if (!url) throw 'You have not set the URL';
     if (!method) throw 'You have not set the method';
@@ -43,8 +24,6 @@ function api_request(url, method, body, callback) {
     console.log(`Conichi API Error: ${ err }`);
     return;
   }
-
-  const uuid = global.session_uuid || null;
 
   const reuqest_body = (body) ? JSON.stringify(body) : '';
 
@@ -84,14 +63,11 @@ function api_request(url, method, body, callback) {
   });
 };
 
-function upload_image(url, formData, callback) {
-  checkConfig();
-
+function upload_image(url, formData, uuid, callback) {
   try { 
     if (!url) throw 'You have not set the URL';
     if (!formData) throw 'You have not set formData';
     if (!global.customer_key || !global.api_secret) throw 'Have you forgot to call the init function first?';
-    if (!global.session_uuid) throw 'Have you forgot to set the UUID first?';
   }
   catch(err) {
     console.log(`Conichi API Error: ${ err }`);
@@ -102,7 +78,7 @@ function upload_image(url, formData, callback) {
   const bodyhash = bodyhash_raw.replace(/\//g, '_').replace(/\+/g, '-')
 
   const timestamp = Math.floor(Date.now() / 1000);
-  const normalized_string = global.session_uuid + "\nPUT\n" + url + "\n" + bodyhash  + "\n" + timestamp;
+  const normalized_string = uuid + "\nPUT\n" + url + "\n" + bodyhash  + "\n" + timestamp;
 
   const hmac_raw = crypto.createHmac('sha256', global.api_secret).update(normalized_string).digest('base64')
   const hmac = hmac_raw.replace(/\//g , '_').replace(/\+/g, '-')
@@ -115,7 +91,7 @@ function upload_image(url, formData, callback) {
     headers: {
       'User-Agent': 'node.js',
       'X-Consumer-Key': global.customer_key,
-      'X-Session-Uuid': global.session_uuid,
+      'X-Session-Uuid': uuid,
       'X-Hmac': hmac,
       'X-Hmac-Version': 'HMAC-SHA256',
       'X-Hmac-Timestamp': timestamp,
@@ -134,15 +110,8 @@ function upload_image(url, formData, callback) {
   });
 };
 
-function checkConfig() {
-  if (!global.customer_key) { global.customer_key = localStorage.getItem('customer_key'); }
-  if (!global.api_secret) { global.api_secret = localStorage.getItem('api_secret'); }
-  if (!global.session_uuid) { global.session_uuid = localStorage.getItem('session_uuid'); }
-}
-
 module.exports = {
   init : init,
   request : api_request,
-  upload_image : upload_image,
-  set_uuid: set_uuid
+  upload_image : upload_image
 }
