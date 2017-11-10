@@ -41,6 +41,7 @@ function api_request(url, method, body, uuid, callback) {
     method: method,
     json: true,
     body: body,
+    encoding: null,
     headers: {
       'User-Agent': 'node.js',
       'X-Consumer-Key': global.customer_key,
