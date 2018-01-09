@@ -25,9 +25,9 @@ function api_request(url, method, body, uuid, callback) {
     return;
   }
 
-  const reuqest_body = (body) ? JSON.stringify(body) : '';
+  const request_body = (body) ? JSON.stringify(body) : '';
 
-  const bodyhash_raw = crypto.createHmac('sha256', global.api_secret).update(reuqest_body).digest('base64');
+  const bodyhash_raw = crypto.createHmac('sha256', global.api_secret).update(request_body).digest('base64');
   const bodyhash = bodyhash_raw.replace(/\//g, '_').replace(/\+/g, '-');
 
   const timestamp = Math.floor(Date.now() / 1000);
