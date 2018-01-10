@@ -25,9 +25,9 @@ function api_request(url, method, body, uuid, callback) {
     return;
   }
 
-  const reuqest_body = (body) ? JSON.stringify(body) : '';
+  const request_body = (body) ? JSON.stringify(body) : '';
 
-  const bodyhash_raw = crypto.createHmac('sha256', global.api_secret).update(reuqest_body).digest('base64');
+  const bodyhash_raw = crypto.createHmac('sha256', global.api_secret).update(request_body).digest('base64');
   const bodyhash = bodyhash_raw.replace(/\//g, '_').replace(/\+/g, '-');
 
   const timestamp = Math.floor(Date.now() / 1000);
@@ -36,11 +36,10 @@ function api_request(url, method, body, uuid, callback) {
   const hmac_raw = crypto.createHmac('sha256', global.api_secret).update(normalized_string).digest('base64');
   const hmac = hmac_raw.replace(/\//g , '_').replace(/\+/g, '-');
 
-  request({
+  let opts = {
     url: url,
     method: method,
     json: true,
-    body: body,
     encoding: null,
     headers: {
       'User-Agent': 'node.js',
@@ -51,7 +50,10 @@ function api_request(url, method, body, uuid, callback) {
       'X-HMAC-Timestamp': timestamp,
       'X-Body-Hash': bodyhash
     }
-  }, function (error, response, body) {
+  };
+  if (body) opts.body = body;
+
+  request(opts, function (error, response, body) {
     try {
       if (error) throw 'Error making api request';
     }
