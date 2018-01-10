@@ -1,6 +1,6 @@
 {
   "name": "conichi-node-authorisation",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "This module allows conichi services and 3rd party partners to make authenticated requests to the conichi API.",
   "main": "index.js",
   "scripts": {
