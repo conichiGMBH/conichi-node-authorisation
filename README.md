@@ -15,23 +15,18 @@ Install conichi and save it in the dependencies list. For example:
 ```
 const conichi = require('conichi-node-authorisation');
 
-// Replace these values with the cosumer_key and api_key given to you from conichi.
-conichi.init(cosumer_key, api_key);
-
-// Set user UUID, this should be done directly after the user is logged in using the UUID
-// you recieve from the login response.
-conichi.set_uuid(uuid);
-
 // Make request
-conichi.request(url, method, body, function(response){
+conichi.request(url, method, body, headers, (response) => {
   console.log(response);
 });
 
 // To upload an image, please make sure you are submitting it as multipart/formdata.
-conichi.upload_image(url, formData, function(response){
+conichi.upload_image(url, formData, headers, (response) => {
   console.log(response);
 });
 ```
+
+NOTE: Headers must contain 'uuid', 'consumer_key' and 'api_secret'.
 
 Please refer to the documentation for information about the correct url endpoints, HTTP methods and expected body content.
 
