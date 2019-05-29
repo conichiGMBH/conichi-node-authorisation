@@ -2,13 +2,13 @@ const request = require('request');
 const crypto = require('crypto');
 
 function api_request(url, method, body, headers, callback) {
-  try { 
+  try {
     if (!url) throw 'You have not set the URL';
     if (!method) throw 'You have not set the method';
     if (!headers) throw 'You have not set the headers';
   }
-  catch(err) {
-    console.log(`Conichi API Error: ${ err }`);
+  catch (err) {
+    console.log(`Conichi API Error: ${err}`);
     return;
   }
 
@@ -18,10 +18,10 @@ function api_request(url, method, body, headers, callback) {
   const bodyhash = bodyhash_raw.replace(/\//g, '_').replace(/\+/g, '-');
 
   const timestamp = Math.floor(Date.now() / 1000);
-  const normalized_string = headers.uuid + "\n" + method + "\n" + url + "\n" + bodyhash  + "\n" + timestamp;
+  const normalized_string = headers.uuid + "\n" + method + "\n" + url + "\n" + bodyhash + "\n" + timestamp;
 
   const hmac_raw = crypto.createHmac('sha256', headers.api_secret).update(normalized_string).digest('base64');
-  const hmac = hmac_raw.replace(/\//g , '_').replace(/\+/g, '-');
+  const hmac = hmac_raw.replace(/\//g, '_').replace(/\+/g, '-');
 
   const meta = {
     'User-Agent': 'node.js',
@@ -33,7 +33,7 @@ function api_request(url, method, body, headers, callback) {
     'X-HMAC-Timestamp': timestamp,
     'X-Body-Hash': bodyhash
   };
-  
+
   if (headers['Authorization']) meta['Authorization'] = headers['Authorization'];
 
   let opts = {
@@ -43,29 +43,29 @@ function api_request(url, method, body, headers, callback) {
     encoding: null,
     headers: meta
   };
-    if (body) opts.body = body;
+  if (body) opts.body = body;
 
-    request(opts, function (error, response, body) {
+  request(opts, function (error, response, body) {
     try {
-    if (error) throw 'Error making api request';
-  }
-  catch(err) {
-    console.log(`Conichi API Error: ${ err }`, error);
-    return;
-  }
+      if (error) throw 'Error making api request';
+    }
+    catch (err) {
+      console.log(`Conichi API Error: ${err}`, error);
+      return;
+    }
 
-  callback(response);
-});
+    callback(response);
+  });
 };
 
 function upload_image(url, formData, headers, callback) {
-  try { 
+  try {
     if (!url) throw 'You have not set the URL';
     if (!formData) throw 'You have not set formData';
     if (!headers) throw 'You have not set the headers';
   }
-  catch(err) {
-    console.log(`Conichi API Error: ${ err }`);
+  catch (err) {
+    console.log(`Conichi API Error: ${err}`);
     return;
   }
 
@@ -73,14 +73,15 @@ function upload_image(url, formData, headers, callback) {
   const bodyhash = bodyhash_raw.replace(/\//g, '_').replace(/\+/g, '-')
 
   const timestamp = Math.floor(Date.now() / 1000);
-  const normalized_string = headers.uuid + "\nPUT\n" + url + "\n" + bodyhash  + "\n" + timestamp;
+  const normalized_string = headers.uuid + "\nPATCH\n" + url + "\n" + bodyhash + "\n" + timestamp;
 
   const hmac_raw = crypto.createHmac('sha256', headers.api_secret).update(normalized_string).digest('base64')
-  const hmac = hmac_raw.replace(/\//g , '_').replace(/\+/g, '-')
+
+  const hmac = hmac_raw.replace(/\//g, '_').replace(/\+/g, '-')
 
   request({
     url: url,
-    method: 'PUT',
+    method: 'PATCH',
     body: '',
     formData: formData,
     headers: {
@@ -96,8 +97,8 @@ function upload_image(url, formData, headers, callback) {
     try {
       if (error) throw 'Error making api request';
     }
-    catch(err) {
-      console.log(`Conichi API Error: ${ err }`, error);
+    catch (err) {
+      console.log(`Conichi API Error: ${err}`, error);
       return;
     }
 
@@ -106,6 +107,6 @@ function upload_image(url, formData, headers, callback) {
 };
 
 module.exports = {
-  request : api_request,
-  upload_image : upload_image
+  request: api_request,
+  upload_image: upload_image
 }
